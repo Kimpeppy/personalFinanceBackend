@@ -1,6 +1,7 @@
 
 require('dotenv').config();
-const plaidClient = require('../Api/plaidClient')
+const {plaidClient} = require('../Api/plaidClient.js')
+
 
 // PLAID_PRODUCTS is a comma-separated list of products to use when initializing
 // Link. Note that this list must contain 'assets' in order for the app to be
@@ -24,10 +25,9 @@ const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || 'US').split(
 // at https://dashboard.plaid.com/team/api.
 const PLAID_REDIRECT_URI = process.env.PLAID_REDIRECT_URI || '';
 
-// Edit this code to address linktokencreate is not a function
 const generateLinkToken = (request, response, next) => {
     Promise.resolve()
-        .then(async () => {
+        .then(async () => {          
             const configs = {
                 user: {
                   client_user_id: 'user-id',
@@ -37,12 +37,17 @@ const generateLinkToken = (request, response, next) => {
                 country_codes: PLAID_COUNTRY_CODES,
                 language: 'en',
               };
-        
               if (PLAID_REDIRECT_URI !== '') {
                 configs.redirect_uri = PLAID_REDIRECT_URI;
               }
-              const createTokenResponse = await plaidClient.linkTokenCreate(configs);
-              response.json(createTokenResponse.data);
+              try {
+                const createTokenResponse = await plaidClient.linkTokenCreate(configs);
+                response.json(createTokenResponse.data);
+              } catch (error) {
+                console.error('Error creating link token:', error);
+                response.status(500).json({ error: 'Internal server error' });
+              }
+              
         })
         .catch(next);
 }
