@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node backend/server.js",
     "server": "nodemon backend/server.js",
-    "client": "npm start --prefix frontend",
+    "client": "cd frontend && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\""
+  
   },
   "author": "Michael Kim",
   "license": "MIT",

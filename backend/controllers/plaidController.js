@@ -1,29 +1,10 @@
 
 require('dotenv').config();
-const {plaidClient} = require('../Api/plaidClient.js')
+const {plaidClient, PLAID_PRODUCTS, PLAID_COUNTRY_CODES, PLAID_REDIRECT_URI } = require('../Api/plaidClient.js')
 
-
-// PLAID_PRODUCTS is a comma-separated list of products to use when initializing
-// Link. Note that this list must contain 'assets' in order for the app to be
-// able to create and retrieve asset reports.
-const PLAID_PRODUCTS = (process.env.PLAID_PRODUCTS || Products.Transactions).split(
-    ',',
-);
-
-// PLAID_COUNTRY_CODES is a comma-separated list of countries for which users
-// will be able to select institutions from.
-const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || 'US').split(
-    ',',
-);
-
-// Parameters used for the OAuth redirect Link flow.
-//
-// Set PLAID_REDIRECT_URI to 'http://localhost:3000'
-// The OAuth redirect flow requires an endpoint on the developer's website
-// that the bank website should redirect to. You will need to configure
-// this redirect URI for your client ID through the Plaid developer dashboard
-// at https://dashboard.plaid.com/team/api.
-const PLAID_REDIRECT_URI = process.env.PLAID_REDIRECT_URI || '';
+const prettyPrintResponse = (response) => {
+  console.log(util.inspect(response.data, { colors: true, depth: 4 }));
+};
 
 const generateLinkToken = (request, response, next) => {
     Promise.resolve()
@@ -33,8 +14,8 @@ const generateLinkToken = (request, response, next) => {
                   client_user_id: 'user-id',
                 },
                 client_name: 'Plaid Quickstart',
-                products: PLAID_PRODUCTS,
-                country_codes: PLAID_COUNTRY_CODES,
+                products: PLAID_PRODUCTS.split(','),
+                country_codes: PLAID_COUNTRY_CODES.split(','),
                 language: 'en',
               };
               if (PLAID_REDIRECT_URI !== '') {
@@ -51,6 +32,35 @@ const generateLinkToken = (request, response, next) => {
         })
         .catch(next);
 }
+const setAccessToken = (request, response, next) => {
+  PUBLIC_TOKEN = request.body.public_token;
+  Promise.resolve()
+    .then(async function() {
+      try {
+        
+        const tokenResponse = await plaidClient.itemPublicTokenExchange({
+          public_token: PUBLIC_TOKEN,
+        })
+        prettyPrintResponse(tokenResponse)
+        ACCESS_TOKEN = tokenResponse.data.access_token;
+        ITEM_ID = tokenResponse.data.item_id;
+        if (PLAID_PRODUCTS.includes(Products.Transfer)) {
+          TRANSFER_ID = await authorizeAndCreateTransfer(ACCESS_TOKEN);
+        }
+        response.json({
+          // the 'access_token' is a private token, DO NOT pass this token to the frontend in your production environment
+          access_token: ACCESS_TOKEN,
+          item_id: ITEM_ID,
+          error: null,
+        });
+      } catch(error) {
+        console.error('Error creating link token:');
+        response.status(500).json({ error: 'Internal server error' });
+      }
+    })
+    .catch(next);
+}
 module.exports = {
-    generateLinkToken
+    generateLinkToken,
+    setAccessToken
 }
