@@ -3,13 +3,14 @@ import { usePlaidLink } from 'react-plaid-link';
 
 interface PlaidLinkButtonProps {
   linkToken: string;
+  backendServerUrl: string;
 }
 
-const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
+const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken, backendServerUrl }) => {
   const handleOnSuccess = async (public_token: string) => {
     try {
       // Send public_token to the server
-      const response = await fetch('/api/set_access_token', {
+      const response = await fetch(`${backendServerUrl}/api/plaids/set_access_token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

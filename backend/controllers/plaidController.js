@@ -1,6 +1,11 @@
 
 require('dotenv').config();
+const util = require('util');
+
 const {plaidClient, PLAID_PRODUCTS, PLAID_COUNTRY_CODES, PLAID_REDIRECT_URI } = require('../Api/plaidClient.js')
+const { Products } = require('plaid')
+
+let ACCESS_TOKEN = null;
 
 const prettyPrintResponse = (response) => {
   console.log(util.inspect(response.data, { colors: true, depth: 4 }));
@@ -32,12 +37,12 @@ const generateLinkToken = (request, response, next) => {
         })
         .catch(next);
 }
+
 const setAccessToken = (request, response, next) => {
   PUBLIC_TOKEN = request.body.public_token;
   Promise.resolve()
     .then(async function() {
       try {
-        
         const tokenResponse = await plaidClient.itemPublicTokenExchange({
           public_token: PUBLIC_TOKEN,
         })
@@ -54,13 +59,35 @@ const setAccessToken = (request, response, next) => {
           error: null,
         });
       } catch(error) {
-        console.error('Error creating link token:');
+        console.error('Error creating link token:', error);
         response.status(500).json({ error: 'Internal server error' });
       }
     })
     .catch(next);
 }
+
+const getAccount = (request, response, next) => {
+  Promise.resolve()
+    .then(async function() {
+      try {
+        const accountsResponse = await plaidClient.accountsGet({
+          access_token: ACCESS_TOKEN
+        });
+        prettyPrintResponse(accountsResponse);
+        response.json(accountsResponse.data);
+      } catch (error) {
+        console.error('Error creating link token:', error);
+        response.status(500).json({ error: 'Internal server error' });
+      }
+      
+
+    })
+    .catch(next);
+}
+
+
 module.exports = {
     generateLinkToken,
-    setAccessToken
+    setAccessToken,
+    getAccount
 }
