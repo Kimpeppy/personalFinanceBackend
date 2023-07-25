@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState, ChangeEvent } from 'react';
 
 interface FormInputProps {
   type: string;
   id: string;
   name: string;
   placeholder: string;
+  value?: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  
+  
 }
 
-const FormInput: React.FC<FormInputProps> = ({ type, id, name, placeholder }) => {
+const FormInput: React.FC<FormInputProps> = ({ type, id, name, placeholder, value, onChange }) => {
   return (
     <div className="form-group">
       <input
@@ -16,6 +20,8 @@ const FormInput: React.FC<FormInputProps> = ({ type, id, name, placeholder }) =>
         id={id}
         name={name}
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
       />
     </div>
   );

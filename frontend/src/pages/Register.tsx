@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { FaSignInAlt } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for styling
@@ -20,7 +20,6 @@ const Register: React.FC<MyComponentProps> = () => {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     // Check if all fields are filled
     if (!name || !email || !password || !password2) {
       toast.error('Please fill in all fields.');
@@ -33,7 +32,6 @@ const Register: React.FC<MyComponentProps> = () => {
       return;
     }
 
-    // Add the logic to send the form data to your backend using axios
     try {
       const response = await axios.post('/api/users', {
         name,
@@ -51,6 +49,14 @@ const Register: React.FC<MyComponentProps> = () => {
     }
   };
 
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  }
+
   return (
     <>
       <ToastContainer /> {/* This component is required to use react-toastify */}
@@ -63,14 +69,16 @@ const Register: React.FC<MyComponentProps> = () => {
 
       <section className='form'>
         <form onSubmit={onSubmit}>
-          <FormInput type='text' id='name' name='name' placeholder='Enter your name' />
-          <FormInput type='email' id='email' name='email' placeholder='Enter your email' />
-          <FormInput type='password' id='password' name='password' placeholder='Enter password' />
+          <FormInput type='text' id='name' name='name' placeholder='Enter your name' value = {name} onChange = {onChange} />
+          <FormInput type='email' id='email' name='email' placeholder='Enter your email' value = {email} onChange = {onChange}/>
+          <FormInput type='password' id='password' name='password' placeholder='Enter password' value = {password} onChange = {onChange}/>
           <FormInput
             type='password'
             id='password2'
             name='password2'
             placeholder='Confirm password'
+            value = {password2} 
+            onChange = {onChange}
           />
           <div className='form-group'>
             <button type='submit' className='btn btn-block'>
