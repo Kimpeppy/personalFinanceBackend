@@ -22,7 +22,7 @@ const PlaidLinkContainer: React.FC = () => {
   return (
     <div>
       {linkToken != null ? (
-        <PlaidLinkButton linkToken={linkToken} backendServerUrl='http://localhost:5000' />
+        <PlaidLinkButton linkToken={linkToken} />
       ) : null}
     </div>
   );

@@ -6,6 +6,7 @@ const {plaidClient, PLAID_PRODUCTS, PLAID_COUNTRY_CODES, PLAID_REDIRECT_URI } = 
 const { Products } = require('plaid')
 
 let ACCESS_TOKEN = null;
+let cursor = null;
 
 const prettyPrintResponse = (response) => {
   console.log(util.inspect(response.data, { colors: true, depth: 4 }));
@@ -59,7 +60,7 @@ const setAccessToken = (request, response, next) => {
           error: null,
         });
       } catch(error) {
-        console.error('Error creating link token:', error);
+        console.error('Error setting link token:', error);
         response.status(500).json({ error: 'Internal server error' });
       }
     })
@@ -76,7 +77,7 @@ const getAccount = (request, response, next) => {
         prettyPrintResponse(accountsResponse);
         response.json(accountsResponse.data);
       } catch (error) {
-        console.error('Error creating link token:', error);
+        console.error('Error getting accounts:', error);
         response.status(500).json({ error: 'Internal server error' });
       }
       
@@ -86,8 +87,8 @@ const getAccount = (request, response, next) => {
 }
 
 const getTransactions = (request, response, next) => {
-  Promise.resolve()
-    .then(async function() {
+  Promise.resolve(request.body.access_token)
+    .then(async function(access_token) {
       try {
         // New transaction updates since "cursor"
         let added = [];
@@ -98,10 +99,11 @@ const getTransactions = (request, response, next) => {
 
         while (hasMore) {
           const request = {
-            access_token: ACCESS_TOKEN,
+            access_token: access_token,
             cursor: cursor,
           };
-          const response = await client.transactionsSync(request)
+          console.log("here")
+          const response = await plaidClient.transactionsSync(request)
           const data = response.data;
           // Add this page of results
           added = added.concat(data.added);
@@ -117,7 +119,7 @@ const getTransactions = (request, response, next) => {
         const recently_added = [...added].sort(compareTxnsByDateAscending).slice(-8);
         response.json({latest_transactions: recently_added});
       } catch (error) {
-        console.error('Error creating link token:', error);
+        console.error('Error getting transactions:');
         response.status(500).json({ error: 'Internal server error' });
       }
     })

@@ -14,6 +14,8 @@ const Header: React.FC<MyComponentProps> = () => {
   const onLogout = () => {
     // Add the logic to remove the user data from localStorage
     localStorage.removeItem('user');
+    localStorage.removeItem('public_token')
+    localStorage.removeItem('link_token')
     // Redirect to the homepage after logout
     window.location.reload()
   };

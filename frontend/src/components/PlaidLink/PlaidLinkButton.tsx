@@ -1,26 +1,22 @@
 import React from 'react';
 import { usePlaidLink } from 'react-plaid-link';
+import axios from 'axios';
 
 interface PlaidLinkButtonProps {
   linkToken: string;
-  backendServerUrl: string;
 }
 
-const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken, backendServerUrl }) => {
+const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
   const handleOnSuccess = async (public_token: string) => {
     try {
       // Send public_token to the server
-      const response = await fetch(`http://localhost:5000/api/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ public_token }),
-      });
+      const response = await axios.post('http://localhost:5000/api/plaids/set_access_token', {public_token});
 
-      // Handle response ...
-      if (response.ok) {
+      // Handle response ... 
+      if (response.status == 200) {
+        localStorage.setItem('access_token', response.data.access_token)
         console.log('Access token set successfully.');
+        
       } else {
         console.error('Failed to set access token.');
       }
