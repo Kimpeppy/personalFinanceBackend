@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePlaidLink } from 'react-plaid-link';
 import axios from 'axios';
+
 
 interface PlaidLinkButtonProps {
   linkToken: string;
 }
 
 const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any[]>(() => {
+    const savedTransactions = localStorage.getItem('transactions');
+    return savedTransactions ? JSON.parse(savedTransactions) : [];
+  });
 
-  const checkLocalStorageItemExists = (key: string): boolean => {
-    const value = localStorage.getItem(key);
-    return value !== null;
-  };
+  useEffect(() => {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+  }, [transactions]);
 
   const handleOnSuccess = async (public_token: string) => {
     try {
@@ -49,12 +52,8 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
 
   return (
     <>
-      <button onClick={() => open()} disabled={!ready}>
-        Link account
-      </button>
-
-      {/* Display transactions */}
-      {transactions.length > 0 && (
+      
+      {transactions.length > 0 ? (
         <div>
           <h2>Transactions:</h2>
           <ul>
@@ -63,13 +62,20 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
                 <p>Name: {transaction.name}</p>
                 <p>Amount: {transaction.amount}</p>
                 <p>Currency: {transaction.currency}</p>
-                <p>Category: {transaction.category.join(', ')}</p>
+                <p>Category: {transaction.category?.length > 0 ? transaction.category.join(', ') : 'N/A'}</p>
                 <p>Date: {transaction.date}</p>
                 <p>Transaction Type: {transaction.transaction_type}</p>
               </li>
             ))}
           </ul>
+          
+          
+          
         </div>
+      ) : (
+        <button onClick={() => open()} disabled={!ready}>
+          Link account
+        </button>
       )}
     </>
   );

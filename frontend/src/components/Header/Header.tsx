@@ -16,6 +16,7 @@ const Header: React.FC<MyComponentProps> = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('public_token')
     localStorage.removeItem('link_token')
+    localStorage.removeItem('transactions')
     // Redirect to the homepage after logout
     window.location.reload()
   };

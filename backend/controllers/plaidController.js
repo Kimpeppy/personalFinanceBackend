@@ -87,7 +87,7 @@ const getAccount = (request, response, next) => {
 }
 
 const getTransactions = (request, response, next) => {
-  Promise.resolve(request.body.ACCESS_TOKEN)
+  Promise.resolve(request.query.ACCESS_TOKEN)
     .then(async function (ACCESS_TOKEN) {
         try {
           /// Set cursor to empty to receive all historical updates
