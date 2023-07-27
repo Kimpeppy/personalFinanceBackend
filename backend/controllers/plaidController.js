@@ -87,8 +87,8 @@ const getAccount = (request, response, next) => {
 }
 
 const getTransactions = (request, response, next) => {
-  Promise.resolve(request.body.access_token)
-    .then(async function(access_token) {
+  Promise.resolve(request.query.ACCESS_TOKEN)
+    .then(async function (ACCESS_TOKEN) {
       try {
         // New transaction updates since "cursor"
         let added = [];
@@ -98,13 +98,13 @@ const getTransactions = (request, response, next) => {
         let hasMore = true;
 
         while (hasMore) {
-          const request = {
-            access_token: access_token,
+          const plaidRequest = {
+            access_token: ACCESS_TOKEN,
             cursor: cursor,
           };
-          console.log("here")
-          const response = await plaidClient.transactionsSync(request)
-          const data = response.data;
+
+          const plaidResponse = await plaidClient.transactionsSync(plaidRequest);
+          const data = plaidResponse.data;
           // Add this page of results
           added = added.concat(data.added);
           modified = modified.concat(data.modified);
@@ -112,19 +112,31 @@ const getTransactions = (request, response, next) => {
           hasMore = data.has_more;
           // Update cursor to the next cursor
           cursor = data.next_cursor;
-          prettyPrintResponse(response);
+          prettyPrintResponse(plaidResponse);
         }
         const compareTxnsByDateAscending = (a, b) => (a.date > b.date) - (a.date < b.date);
-        // Return the 8 most recent transactions
-        const recently_added = [...added].sort(compareTxnsByDateAscending).slice(-8);
-        response.json({latest_transactions: recently_added});
+        // Return the 8 most recent transactions with money amount
+        const recently_added_with_money = [...added]
+          .sort(compareTxnsByDateAscending)
+          .slice(-8)
+          .map((transaction) => ({
+            account_id: transaction.account_id,
+            name: transaction.name,
+            amount: transaction.amount,
+            currency: transaction.iso_currency_code,
+            category: transaction.category,
+            date: transaction.date,
+            transaction_type: transaction.transaction_type,
+
+          }));
+        response.json({ latest_transactions: recently_added_with_money });
       } catch (error) {
-        console.error('Error getting transactions:');
-        response.status(500).json({ error: 'Internal server error' });
+        console.error('Error getting transactions:', error);
+        response.status(500).json({ error: 'Internal server error', error });
       }
     })
     .catch(next);
-}
+};
 
 
 
