@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePlaidLink } from 'react-plaid-link';
 import axios from 'axios';
+import TransactionList from '../Table/TransactionList';
 
 
 interface PlaidLinkButtonProps {
@@ -55,22 +56,7 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
       
       {transactions.length > 0 ? (
         <div>
-          <h2>Transactions:</h2>
-          <ul>
-            {transactions.map((transaction, index) => (
-              <li key={index}>
-                <p>Name: {transaction.name}</p>
-                <p>Amount: {transaction.amount}</p>
-                <p>Currency: {transaction.currency}</p>
-                <p>Category: {transaction.category?.length > 0 ? transaction.category.join(', ') : 'N/A'}</p>
-                <p>Date: {transaction.date}</p>
-                <p>Transaction Type: {transaction.transaction_type}</p>
-              </li>
-            ))}
-          </ul>
-          
-          
-          
+          <TransactionList transactions={transactions}/>
         </div>
       ) : (
         <button onClick={() => open()} disabled={!ready}>

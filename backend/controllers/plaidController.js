@@ -131,6 +131,7 @@ const getTransactions = (request, response, next) => {
             date: transaction.date,
             transaction_type: transaction.transaction_type,
         }));
+        console.log(recently_added_with_money)
 
         response.json({latest_transactions: recently_added_with_money});
       } catch (error) {
