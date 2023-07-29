@@ -16,17 +16,17 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
       footer: 'NAME'
     },
     {
-      header: 'amount',
+      header: 'Amount',
       accessorKey: 'amount',
       footer: 'amount'
     },
     {
-      header: 'currency',
+      header: 'Currency',
       accessorKey: 'currency',
       footer: 'currency'
     },
     {
-      header: 'date',
+      header: 'Date',
       accessorKey: 'date',
       footer: 'date'
     }
@@ -36,18 +36,37 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions }) => {
   const table = useReactTable({data, columns, getCoreRowModel: getCoreRowModel()});
   return (
     <div>
-      <h2>Transactions:</h2>
-      <ul>
-        {transactions.map((transaction, index) => (
-          <li key={index}>
-            <p>Name: {transaction.name}</p>
-            <p>Amount: {transaction.amount}</p>
-            <p>Currency: {transaction.currency}</p>
-            <p>Date: {transaction.date}</p>
-            <h1>------------------------</h1>
-          </li>
+      <table style={{ fontSize: '20px' }}>
+        {table.getHeaderGroups().map(headerGroup => (
+          <tr key = {headerGroup.id}>
+            {headerGroup.headers.map(header => <th key = {header.id} style={{fontWeight: 'normal', padding: '8px' }}>
+              {flexRender(header.column.columnDef.header, header.getContext())}
+            </th>)}
+          </tr>
         ))}
-      </ul>
+        
+        <tbody>
+          {table.getRowModel().rows.map(row => (
+            <tr key = {row.id}>
+              {row.getVisibleCells().map(cell => (
+                <td key = {cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+            </tr>
+          ))}
+          
+        </tbody>
+        <tfoot>
+          {table.getFooterGroups().map(footerGroup => (
+            <tr key = {footerGroup.id}>
+              {footerGroup.headers.map(footer => <th key = {footer.id} style={{fontWeight: 'normal', padding: '8px' }}>
+                {flexRender(footer.column.columnDef.header, footer.getContext())}
+              </th>)}
+            </tr>
+          ))}
+        </tfoot>
+      </table>
     </div>
   );
 };

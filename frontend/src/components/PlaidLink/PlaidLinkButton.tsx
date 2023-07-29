@@ -53,7 +53,6 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
 
   return (
     <>
-      
       {transactions.length > 0 ? (
         <div>
           <TransactionList transactions={transactions}/>

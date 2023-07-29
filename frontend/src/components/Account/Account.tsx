@@ -13,7 +13,6 @@ const Account: React.FC = () => {
   return (
     <div>
       <PlaidLinkContainer />
-      
     </div>
   );
 };

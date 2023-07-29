@@ -1,9 +1,8 @@
-
 require('dotenv').config();
 const util = require('util');
-
-const {plaidClient, PLAID_PRODUCTS, PLAID_COUNTRY_CODES, PLAID_REDIRECT_URI } = require('../Api/plaidClient.js')
-const { Products } = require('plaid')
+const Transactions = require('../model/userModel');
+const { plaidClient, PLAID_PRODUCTS, PLAID_COUNTRY_CODES, PLAID_REDIRECT_URI } = require('../Api/plaidClient.js');
+const { Products } = require('plaid');
 
 let ACCESS_TOKEN = null;
 let cursor = null;
@@ -13,31 +12,30 @@ const prettyPrintResponse = (response) => {
 };
 
 const generateLinkToken = (request, response, next) => {
-    Promise.resolve()
-        .then(async () => {          
-            const configs = {
-                user: {
-                  client_user_id: 'user-id',
-                },
-                client_name: 'Plaid Quickstart',
-                products: PLAID_PRODUCTS.split(','),
-                country_codes: PLAID_COUNTRY_CODES.split(','),
-                language: 'en',
-              };
-              if (PLAID_REDIRECT_URI !== '') {
-                configs.redirect_uri = PLAID_REDIRECT_URI;
-              }
-              try {
-                const createTokenResponse = await plaidClient.linkTokenCreate(configs);
-                response.json(createTokenResponse.data);
-              } catch (error) {
-                console.error('Error creating link token:', error);
-                response.status(500).json({ error: 'Internal server error' });
-              }
-              
-        })
-        .catch(next);
-}
+  Promise.resolve()
+    .then(async () => {          
+      const configs = {
+        user: {
+          client_user_id: 'user-id',
+        },
+        client_name: 'Plaid Quickstart',
+        products: PLAID_PRODUCTS.split(','),
+        country_codes: PLAID_COUNTRY_CODES.split(','),
+        language: 'en',
+      };
+      if (PLAID_REDIRECT_URI !== '') {
+        configs.redirect_uri = PLAID_REDIRECT_URI;
+      }
+      try {
+        const createTokenResponse = await plaidClient.linkTokenCreate(configs);
+        response.json(createTokenResponse.data);
+      } catch (error) {
+        console.error('Error creating link token:', error);
+        response.status(500).json({ error: 'Internal server error' });
+      }
+    })
+    .catch(next);
+};
 
 const setAccessToken = (request, response, next) => {
   PUBLIC_TOKEN = request.body.public_token;
@@ -46,8 +44,8 @@ const setAccessToken = (request, response, next) => {
       try {
         const tokenResponse = await plaidClient.itemPublicTokenExchange({
           public_token: PUBLIC_TOKEN,
-        })
-        prettyPrintResponse(tokenResponse)
+        });
+        prettyPrintResponse(tokenResponse);
         ACCESS_TOKEN = tokenResponse.data.access_token;
         ITEM_ID = tokenResponse.data.item_id;
         if (PLAID_PRODUCTS.includes(Products.Transfer)) {
@@ -65,7 +63,7 @@ const setAccessToken = (request, response, next) => {
       }
     })
     .catch(next);
-}
+};
 
 const getAccount = (request, response, next) => {
   Promise.resolve()
@@ -80,17 +78,15 @@ const getAccount = (request, response, next) => {
         console.error('Error getting accounts:', error);
         response.status(500).json({ error: 'Internal server error' });
       }
-      
-
     })
     .catch(next);
-}
+};
 
 const getTransactions = (request, response, next) => {
   Promise.resolve(request.query.ACCESS_TOKEN)
     .then(async function (ACCESS_TOKEN) {
-        try {
-          /// Set cursor to empty to receive all historical updates
+      try {
+        /// Set cursor to empty to receive all historical updates
         let cursor = null;
 
         // New transaction updates since "cursor"
@@ -105,7 +101,7 @@ const getTransactions = (request, response, next) => {
             access_token: ACCESS_TOKEN,
             cursor: cursor,
           };
-          const response = await plaidClient.transactionsSync(request)
+          const response = await plaidClient.transactionsSync(request);
           const data = response.data;
           // Add this page of results
           added = added.concat(data.added);
@@ -121,7 +117,6 @@ const getTransactions = (request, response, next) => {
         // Return the 8 most recent transactions
         const recently_added_with_money = [...added]
           .sort(compareTxnsByDateAscending)
-          .slice(-8)
           .map((transaction) => ({
             account_id: transaction.account_id,
             name: transaction.name,
@@ -131,8 +126,7 @@ const getTransactions = (request, response, next) => {
             date: transaction.date,
             transaction_type: transaction.transaction_type,
         }));
-        console.log(recently_added_with_money)
-
+        
         response.json({latest_transactions: recently_added_with_money});
       } catch (error) {
         console.error('Error getting transactions:', error);
@@ -142,12 +136,9 @@ const getTransactions = (request, response, next) => {
     .catch(next);
 };
 
-
-
-
 module.exports = {
-    generateLinkToken,
-    setAccessToken,
-    getAccount,
-    getTransactions
-}
+  generateLinkToken,
+  setAccessToken,
+  getAccount,
+  getTransactions,
+};
