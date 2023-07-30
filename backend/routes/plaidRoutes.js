@@ -7,5 +7,5 @@ router.post('/set_access_token', plaidController.setAccessToken)
 
 router.get('/accounts', plaidController.getAccount)
 router.get('/transactions', plaidController.getTransactions)
-
+router.get('/balances', plaidController.getBalance)
 module.exports = router

@@ -32,6 +32,7 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
           const response2 = await axios.get('http://localhost:5000/api/plaids/transactions', {
             params: requestData,
           });
+          console.log(response2.data.latest_transactions)
           setTransactions(response2.data.latest_transactions); // Update the transactions state
         } catch (error) {
           console.error('Error getting transactions: ', error);

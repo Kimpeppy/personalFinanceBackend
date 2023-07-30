@@ -1,6 +1,6 @@
 require('dotenv').config();
 const util = require('util');
-const Transactions = require('../model/userModel');
+const Transaction = require('../model/transactionModel');
 const { plaidClient, PLAID_PRODUCTS, PLAID_COUNTRY_CODES, PLAID_REDIRECT_URI } = require('../Api/plaidClient.js');
 const { Products } = require('plaid');
 
@@ -126,12 +126,36 @@ const getTransactions = (request, response, next) => {
             date: transaction.date,
             transaction_type: transaction.transaction_type,
         }));
-        
-        response.json({latest_transactions: recently_added_with_money});
+
+        await Transaction.insertMany(recently_added_with_money)
+        const allTransactions = await Transaction.find({})
+
+
+        response.json({latest_transactions: allTransactions});
       } catch (error) {
         console.error('Error getting transactions:', error);
         response.status(500).json({ error: 'Internal server error', error });
       }
+    })
+    .catch(next);
+};
+
+// Retrieve real-time Balances for each of an Item's accounts
+// https://plaid.com/docs/#balance
+const getBalance = (request, response, next) => {
+  Promise.resolve(request.body.ACCESS_TOKEN)
+    .then(async function (ACCESS_TOKEN) {
+      try {
+        const balanceResponse = await plaidClient.accountsBalanceGet({
+          access_token: ACCESS_TOKEN,
+        });
+        prettyPrintResponse(balanceResponse);
+        response.json(balanceResponse.data);
+      } catch (error) {
+        console.error('Error getting balances:', error);
+        response.status(500).json({ error: 'Internal server error', error });
+      }
+      
     })
     .catch(next);
 };
@@ -141,4 +165,6 @@ module.exports = {
   setAccessToken,
   getAccount,
   getTransactions,
+  getBalance
+
 };
