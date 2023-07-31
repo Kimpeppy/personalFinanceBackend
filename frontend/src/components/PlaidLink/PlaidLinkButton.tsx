@@ -59,11 +59,13 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
         <div>
           <DonutChart transactions={transactions}/>
           <TransactionList transactions={transactions}/>
+          
         </div>
       ) : (
         <button onClick={() => open()} disabled={!ready}>
           Link account
         </button>
+        
       )}
     </>
   );
