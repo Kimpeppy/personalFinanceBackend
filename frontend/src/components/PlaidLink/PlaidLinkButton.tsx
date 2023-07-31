@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePlaidLink } from 'react-plaid-link';
 import axios from 'axios';
 import TransactionList from '../Table/TransactionList';
+import DonutChart from '../Graphs/DonutChart';
 
 
 interface PlaidLinkButtonProps {
@@ -56,6 +57,7 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
     <>
       {transactions.length > 0 ? (
         <div>
+          <DonutChart transactions={transactions}/>
           <TransactionList transactions={transactions}/>
         </div>
       ) : (
