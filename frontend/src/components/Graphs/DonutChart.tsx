@@ -70,11 +70,10 @@ const DonutChart: React.FC<Transactions> = ({ transactions }) => {
     };
 
     return (
-        <>
-            <DropDownMenu choices = {monthsObject.array} name = {monthsObject.name}/>
-            <DropDownMenu choices = {yearsObject.array} name = {yearsObject.name}/>
+        <div style={{ height: '600px', width: '600px' }}>
             <Doughnut data={chartData} />
-        </>
+        </div>
+
     );
 };
 

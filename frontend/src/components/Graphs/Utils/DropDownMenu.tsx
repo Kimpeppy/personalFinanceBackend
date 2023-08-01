@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -7,14 +7,17 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 interface DropDownMenuProps {
   choices: string[]; // Replace number[] with the actual type of the choices array
-  name: string
+  name: string;
+  onChange: (selectedOption: string) => void; // Function to handle the change event
 }
 
-const DropDownMenu: React.FC<DropDownMenuProps> = ({ choices, name }) => {
-  const [selectedOption, setSelectedOption] = React.useState('');
+const DropDownMenu: React.FC<DropDownMenuProps> = ({ choices, name, onChange }) => {
+  const [selectedOption, setSelectedOption] = React.useState(choices[0]); // Set the default value to the first option in the choices array
 
   const handleChange = (event: SelectChangeEvent) => {
-    setSelectedOption(event.target.value as string);
+    const selectedValue = event.target.value as string;
+    setSelectedOption(selectedValue);
+    onChange(selectedValue); // Call the onChange function passed from the parent component
   };
 
   return (

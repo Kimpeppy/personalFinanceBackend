@@ -11,6 +11,8 @@ interface FormInputProps {
   
 }
 
+
+
 const FormInput: React.FC<FormInputProps> = ({ type, id, name, placeholder, value, onChange }) => {
   return (
     <div className="form-group">
