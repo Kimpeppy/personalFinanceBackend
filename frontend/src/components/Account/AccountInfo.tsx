@@ -17,6 +17,8 @@ interface transactionsProps {
   category: string[];
 }
 
+
+
 const AccountInfo: React.FC<TransactionProps> = ({ transactions }) => {
     const [selectedMonth, setSelectedMonth] = useState<string>('All Months');
     const [selectedYear, setSelectedYear] = useState<string>('All Years');

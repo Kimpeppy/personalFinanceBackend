@@ -65,22 +65,7 @@ const setAccessToken = (request, response, next) => {
     .catch(next);
 };
 
-const getAccount = (request, response, next) => {
-  Promise.resolve()
-    .then(async function() {
-      try {
-        const accountsResponse = await plaidClient.accountsGet({
-          access_token: ACCESS_TOKEN
-        });
-        prettyPrintResponse(accountsResponse);
-        response.json(accountsResponse.data);
-      } catch (error) {
-        console.error('Error getting accounts:', error);
-        response.status(500).json({ error: 'Internal server error' });
-      }
-    })
-    .catch(next);
-};
+
 
 const getTransactions = (request, response, next) => {
   Promise.resolve(request.query.ACCESS_TOKEN)
@@ -143,7 +128,7 @@ const getTransactions = (request, response, next) => {
 // Retrieve real-time Balances for each of an Item's accounts
 // https://plaid.com/docs/#balance
 const getBalance = (request, response, next) => {
-  Promise.resolve(request.body.ACCESS_TOKEN)
+  Promise.resolve(request.query.ACCESS_TOKEN)
     .then(async function (ACCESS_TOKEN) {
       try {
         const balanceResponse = await plaidClient.accountsBalanceGet({
@@ -163,7 +148,6 @@ const getBalance = (request, response, next) => {
 module.exports = {
   generateLinkToken,
   setAccessToken,
-  getAccount,
   getTransactions,
   getBalance
 

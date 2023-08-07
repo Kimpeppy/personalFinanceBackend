@@ -15,6 +15,7 @@ interface transactionsProps {
 
 const TransactionList: React.FC<TransactionProps> = ({ transactions }) => {
   const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 150 },
     { field: 'name', headerName: 'Name', width: 200 },
     {
       field: 'amount',

@@ -12,6 +12,11 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
     const savedTransactions = localStorage.getItem('transactions');
     return savedTransactions ? JSON.parse(savedTransactions) : [];
   });
+
+  const [balances, setBalances] = useState<any[]>(() => {
+    const savedBalances = localStorage.getItem('balances');
+    return savedBalances ? JSON.parse(savedBalances) : [];
+  });
   
 
   useEffect(() => {
@@ -26,6 +31,7 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
         console.log('Access token set successfully.');
         localStorage.setItem('access_token', response.data.access_token);
         fetchTransactions(response.data.access_token);
+        fetchBalance(response.data.access_token);
       } else {
         console.error('Failed to set access token.');
       }
@@ -34,13 +40,27 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
     }
   };
 
+  const fetchBalance = async (accessToken: string) => {
+    try {
+      const requestData = { ACCESS_TOKEN: accessToken};
+      const response = await axios.get('http://localhost:5000/api/plaids/balances', {
+        params: requestData,
+      });
+      console.log(response.data.accounts)
+      setBalances(response.data.accounts)
+      
+    } catch (error) {
+      console.error('Error getting balance')
+    }
+  }
+
   const fetchTransactions = async (accessToken: string) => {
     try {
       const requestData = { ACCESS_TOKEN: accessToken };
       const response = await axios.get('http://localhost:5000/api/plaids/transactions', {
         params: requestData,
       });
-      console.log(response.data.latest_transactions);
+      console.log(response.data.latest_transactions)
       setTransactions(response.data.latest_transactions); // Update the transactions state
     } catch (error) {
       console.error('Error getting transactions: ', error);
