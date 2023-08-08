@@ -125,22 +125,25 @@ const getTransactions = (request, response, next) => {
     .catch(next);
 };
 
-// Retrieve real-time Balances for each of an Item's accounts
-// https://plaid.com/docs/#balance
-const getBalance = (request, response, next) => {
+const getAccounts = (request, response, next) => {
   Promise.resolve(request.query.ACCESS_TOKEN)
     .then(async function (ACCESS_TOKEN) {
       try {
-        const balanceResponse = await plaidClient.accountsBalanceGet({
-          access_token: ACCESS_TOKEN,
+        const accountsResponse = await plaidClient.accountsGet({
+          access_token: ACCESS_TOKEN
         });
-        prettyPrintResponse(balanceResponse);
-        response.json(balanceResponse.data);
+
+        const filteredAccounts = accountsResponse.data.accounts.map(account => {
+          const { account_id, balances, name, subtype } = account;
+          return { account_id, balances, name, subtype };
+        });
+        prettyPrintResponse(filteredAccounts);
+        response.json(filteredAccounts);
+        
       } catch (error) {
-        console.error('Error getting balances:', error);
+        console.error('Error getting accounts:', error);
         response.status(500).json({ error: 'Internal server error', error });
       }
-      
     })
     .catch(next);
 };
@@ -149,6 +152,6 @@ module.exports = {
   generateLinkToken,
   setAccessToken,
   getTransactions,
-  getBalance
+  getAccounts
 
 };

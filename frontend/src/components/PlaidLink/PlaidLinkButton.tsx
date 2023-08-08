@@ -21,7 +21,8 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
 
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
-  }, [transactions]);
+    localStorage.setItem('balances', JSON.stringify(balances));
+  }, [transactions, balances]);
 
   const handleOnSuccess = async (public_token: string) => {
     try {
@@ -43,11 +44,11 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
   const fetchBalance = async (accessToken: string) => {
     try {
       const requestData = { ACCESS_TOKEN: accessToken};
-      const response = await axios.get('http://localhost:5000/api/plaids/balances', {
+      const response = await axios.get('http://localhost:5000/api/plaids/accounts', {
         params: requestData,
       });
-      console.log(response.data.accounts)
-      setBalances(response.data.accounts)
+      setBalances(response.data)
+
       
     } catch (error) {
       console.error('Error getting balance')
@@ -67,6 +68,7 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
     }
   };
 
+
   const config: Parameters<typeof usePlaidLink>[0] = {
     token: linkToken,
     onSuccess: handleOnSuccess,
@@ -78,7 +80,7 @@ const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({ linkToken }) => {
     <>
       {transactions.length > 0 ? (
         <div>
-          <AccountInfo transactions={ transactions }/>
+          <AccountInfo transactions={ transactions } accounts = {balances}/>
         </div>
       ) : (
         <button onClick={() => open()} disabled={!ready}>
