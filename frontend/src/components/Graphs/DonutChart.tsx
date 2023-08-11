@@ -70,7 +70,7 @@ const DonutChart: React.FC<Transactions> = ({ transactions }) => {
     };
 
     return (
-        <div style={{ height: '600px', width: '600px' }}>
+        <div>
             <Doughnut data={chartData} />
         </div>
 

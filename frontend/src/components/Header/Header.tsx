@@ -24,7 +24,7 @@ const Header: React.FC<MyComponentProps> = () => {
   return (
     <header className='header'>
       <div className='logo'>
-        <Link to='/'>Home</Link>
+        <Link to='/'>FinLife</Link>
       </div>
       <ul>
         {isLoggedIn() ? (
